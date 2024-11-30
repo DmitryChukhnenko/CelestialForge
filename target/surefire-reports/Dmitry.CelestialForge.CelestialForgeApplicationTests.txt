@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: Dmitry.CelestialForge.CelestialForgeApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.773 s -- in Dmitry.CelestialForge.CelestialForgeApplicationTests

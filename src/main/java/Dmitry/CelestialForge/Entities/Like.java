@@ -11,12 +11,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -42,4 +40,35 @@ public class Like implements Serializable{
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = true)
     private Comment comment;
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public BlogPost getBlogPost() {
+        return blogPost;
+    }
+    public void setBlogPost(BlogPost blogPost) {
+        this.blogPost = blogPost;
+    }
+    public Comment getComment() {
+        return comment;
+    }
+    public void setComment(Comment comment) {
+        this.comment = comment;
+    }
 }

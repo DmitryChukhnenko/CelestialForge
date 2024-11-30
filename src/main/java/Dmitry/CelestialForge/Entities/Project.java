@@ -14,12 +14,10 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @ToString
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -41,10 +39,71 @@ public class Project implements Serializable{
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany(targetEntity = Dmitry.CelestialForge.Entities.User.class, mappedBy = "project")
+    @ManyToMany(targetEntity = User.class, mappedBy = "contributingProjects")
     private List<User> contributors;
 
     @OneToMany(mappedBy = "project")
     private List<Donation> donations;
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getDescription() {
+        return description;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public String getPictureUrl() {
+        return pictureUrl;
+    }
+    public void setPictureUrl(String pictureUrl) {
+        this.pictureUrl = pictureUrl;
+    }
+    public Double getTargetAmount() {
+        return targetAmount;
+    }
+    public void setTargetAmount(Double targetAmount) {
+        this.targetAmount = targetAmount;
+    }
+    public Double getRaisedAmount() {
+        return raisedAmount;
+    }
+    public void setRaisedAmount(Double raisedAmount) {
+        this.raisedAmount = raisedAmount;
+    }
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+    public User getUser() {
+        return user;
+    }
+    public void setUser(User user) {
+        this.user = user;
+    }
+    public List<User> getContributors() {
+        return contributors;
+    }
+    public void setContributors(List<User> contributors) {
+        this.contributors = contributors;
+    }
+    public List<Donation> getDonations() {
+        return donations;
+    }
+    public void setDonations(List<Donation> donations) {
+        this.donations = donations;
+    }
 }
 

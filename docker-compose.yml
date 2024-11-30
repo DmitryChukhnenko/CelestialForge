@@ -1,0 +1,64 @@
+# services:
+#   postgres:
+#     image: 'postgres:latest'
+#     environment:
+#       - 'POSTGRES_DB=celestialforge'
+#       - 'POSTGRES_PASSWORD='
+#       - 'POSTGRES_USER=posgres'
+#     ports:
+#       - '5432'
+#   rabbitmq:
+#     image: 'rabbitmq:latest'
+#     environment:
+#       - 'RABBITMQ_DEFAULT_PASS=secret'
+#       - 'RABBITMQ_DEFAULT_USER=myuser'
+#     ports:
+#       - '5672'
+
+services:
+  app:
+    build: .
+    container_name: spring-boot-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./uploads:/app/uploads  # Монтируем локальную папку на хосте
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./uploads:/usr/share/nginx/html/uploads  # Монтируем папку для Nginx
+    networks:
+      - app-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"  # UI для администрирования RabbitMQ
+      - "5672:5672"    # Стандартный порт для RabbitMQ
+    networks:
+      - app-network
+
+  # База данных (например, PostgreSQL)
+  db:
+    image: postgres:latest
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: posgres
+      POSTGRES_PASSWORD: Ilya
+      POSTGRES_DB: celestialforge
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

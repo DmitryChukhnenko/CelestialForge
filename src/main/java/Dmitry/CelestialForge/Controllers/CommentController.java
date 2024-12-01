@@ -1,26 +1,23 @@
 package Dmitry.CelestialForge.Controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import Dmitry.CelestialForge.Entities.BlogPost;
 import Dmitry.CelestialForge.Entities.Comment;
-import Dmitry.CelestialForge.Entities.User;
 import Dmitry.CelestialForge.Services.BlogPostService;
 import Dmitry.CelestialForge.Services.CommentService;
+import Dmitry.CelestialForge.Services.LikeService;
 import Dmitry.CelestialForge.Session.SessionService;
 
-@RestController
-@RequestMapping("/blog-posts/{blogPostId}/comments")
+@Controller
+@RequestMapping("/blog/{blogPostId}/comments")
 public class CommentController {
 
     @Autowired
@@ -29,18 +26,33 @@ public class CommentController {
     private SessionService sessionService;
     @Autowired
     private BlogPostService blogPostService;
+    @Autowired
+    private LikeService likeService;
 
-    @PostMapping
-    public ResponseEntity<Comment> addComment(@PathVariable Long blogPostId, @RequestParam String content) {
-        User user = sessionService.getUser();
+    @GetMapping("/")
+    public String listComments(@PathVariable Long blogPostId, Model model) {
         BlogPost blogPost = blogPostService.findById(blogPostId);
-        Comment comment = commentService.addComment(blogPost, user, content);
-        return ResponseEntity.status(HttpStatus.CREATED).body(comment);
+        // TODO: Подумай о кешировании блог поста
+        model.addAttribute("comments", commentService.findByBlogPost(blogPost));
+        return "comment/list";
     }
 
-    @GetMapping
-    public List<Comment> getComments(@PathVariable Long blogPostId) {
-        BlogPost blogPost = blogPostService.findById(blogPostId);
-        return commentService.findByBlogPost(blogPost);
+    @GetMapping("/create")
+    public String createCommentForm(@PathVariable Long blogPostId, Model model) {
+        model.addAttribute("blogPost", blogPostService.findById(blogPostId));
+        return "comment/create";
+    }
+
+    @PostMapping("/create")
+    public String createBlogPost(@ModelAttribute BlogPost blogPost) {
+        blogPost.setUser(sessionService.getUser());
+        blogPostService.addBlogPost(blogPost);
+        return "redirect:/comments/";
+    }
+
+    @PostMapping("/like")
+    public String likeComment(@ModelAttribute Comment comment) {
+        likeService.addLikeToComment(sessionService.getUser(), comment);
+        return "redirect:/comments/";
     }
 }

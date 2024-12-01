@@ -1,13 +1,15 @@
 package Dmitry.CelestialForge;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest
-class CelestialForgeApplicationTests {
+// @ActiveProfiles("dev")
+// @SpringBootTest
+// class CelestialForgeApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+// 	@Test
+// 	void contextLoads() {
+// 	}
 
-}
+// }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link th:href="@{/css/style.css}" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div>
+	<form action="#" th:action="@{/login}" th:object="${user}" method="post" class="form">
+		<div th:if="${errorMessage != null}" th:text="${errorMessage}" style="color: red"></div>
+		<div>
+			<label for="email">Email:</label>
+			<input th:field="*{email}" name="email" id="email">	
+		</div>
+		<div>
+			<label for="password">Password:</label>
+			<input type="password" th:field="*{password}" name="password" id="password">	
+		</div>
+		<div>
+			<button>Submit</button>
+		</div>
+	</form>
+	<div>
+		<a href="/registration">Sign up</a>
+	</div>
+</div>
+</body>
+</html>

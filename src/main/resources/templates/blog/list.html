@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Blog Posts</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <h1>Blog Posts</h1>
+        <div>
+            <a href="/blog/create" class="btn btn-primary">Create New Blog Post</a>
+        </div>
+        <div class="blog-posts">
+            <ul>
+                <li th:each="blogPost : ${blogPosts}">
+                    <a th:href="@{/blog/{id}(id=${blogPost.id})}" th:text="${blogPost.title}"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

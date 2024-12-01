@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .maximumSessions(1)
             )
             .authorizeHttpRequests((authz) -> authz
-            	.requestMatchers("/registration", "/login", "/css/**", "/js/**").permitAll()
+            	.requestMatchers("/registration", "/login", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

@@ -1,63 +1,83 @@
-# services:
-#   postgres:
-#     image: 'postgres:latest'
-#     environment:
-#       - 'POSTGRES_DB=celestialforge'
-#       - 'POSTGRES_PASSWORD='
-#       - 'POSTGRES_USER=posgres'
-#     ports:
-#       - '5432'
-#   rabbitmq:
-#     image: 'rabbitmq:latest'
-#     environment:
-#       - 'RABBITMQ_DEFAULT_PASS=secret'
-#       - 'RABBITMQ_DEFAULT_USER=myuser'
-#     ports:
-#       - '5672'
-
-services:
-  app:
-    build: .
-    container_name: spring-boot-app
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./uploads:/app/uploads  # Монтируем локальную папку на хосте
-    networks:
-      - app-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    ports:
-      - "80:80"
-    volumes:
-      - ./uploads:/usr/share/nginx/html/uploads  # Монтируем папку для Nginx
-    networks:
-      - app-network
-
+services:  
   # RabbitMQ
   rabbitmq:
     image: "rabbitmq:3-management"
     container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VIRTUAL_HOST}
     ports:
-      - "15672:15672"  # UI для администрирования RabbitMQ
-      - "5672:5672"    # Стандартный порт для RabbitMQ
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}" # Стандартный порт для RabbitMQ
+      - "${RABBITMQ_ADMIN_PORT}:${RABBITMQ_ADMIN_PORT}" # UI для администрирования RabbitMQ 
     networks:
       - app-network
 
-  # База данных (например, PostgreSQL)
+  # База данных (PostgreSQL)
   db:
     image: postgres:latest
     container_name: postgres-db
     environment:
-      POSTGRES_USER: posgres
-      POSTGRES_PASSWORD: Ilya
-      POSTGRES_DB: celestialforge
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     networks:
       - app-network
+
+  # Файловое хранилище (Minio)
+  minio:
+    image: minio/minio
+    container_name: minio
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_HTTP_ADDR: ${MINIO_HTTP_ADDR}
+      MINIO_BROWSER: ${MINIO_BROWSER}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: server /data
+    ports:
+      - "${MINIO_PORT}:${MINIO_PORT}"
+    volumes:
+      - minio_data:/data
+    networks:
+      - app-network
+    
+  #Spring
+  app:
+    build: .
+    container_name: spring-boot-app
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"    
+    volumes:
+      - ./uploads:/app/uploads    
+    depends_on:
+      - db
+      - rabbitmq
+      - minio
+    networks:
+      - app-network
+
+  #Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "${NGINX_PORT}:${NGINX_PORT}"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - rabbitmq
+      - minio
+    networks:
+      - app-network
+
+volumes:
+  minio_data:
 
 networks:
   app-network:

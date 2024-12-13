@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Пожертвовать - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <a th:href="@{/project/{id}(id=${project.id})}" class="btn btn-secondary">Назад</a>
+        <h1>Пожертвовать на проект: <span th:text="${project.title}"></span></h1>
+        <form action="#" th:action="@{/project/{id}/donate(id=${project.id})}" method="post" class="form">
+            <div>
+                <label for="amount">Сумма:</label>
+                <input type="number" id="amount" name="amount" step="0.01" min="1" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Пожертвовать</button>
+        </form>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

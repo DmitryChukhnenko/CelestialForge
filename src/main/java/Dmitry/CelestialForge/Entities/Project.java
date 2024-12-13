@@ -1,14 +1,14 @@
 package Dmitry.CelestialForge.Entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -22,28 +22,42 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name="Projects")
-public class Project implements Serializable{
-	private static final long serialVersionUID = 1L;
+public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
-    private String description; // потенциально - сложный структурированый элемент
-    private String pictureUrl;  // Ссылка на изображение в S3
+    private String description;
+    private String pictureUrl; 
     private Double targetAmount;
     private Double raisedAmount = 0.0;
-    private LocalDateTime endTime;
+    private LocalDateTime endTime;    
     
     @ManyToOne
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToMany(targetEntity = User.class, mappedBy = "contributingProjects")
-    private List<User> contributors;
+    private Set<User> contributors = new HashSet<>();
 
     @OneToMany(mappedBy = "project")
-    private List<Donation> donations;
+    private Set<Donation> donations = new HashSet<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BlogPost> blogPosts = new HashSet<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Milestone> milestones = new HashSet<>();
+
+    public void addContributor(User user) {
+        this.contributors.add(user);
+        user.getContributingProjects().add(this);
+    }
+
+    public void removeContributor(User user) {
+        this.contributors.remove(user);
+        user.getContributingProjects().remove(this);
+    }
 
     public Long getId() {
         return id;
@@ -93,17 +107,45 @@ public class Project implements Serializable{
     public void setUser(User user) {
         this.user = user;
     }
-    public List<User> getContributors() {
+    public Set<User> getContributors() {
         return contributors;
     }
-    public void setContributors(List<User> contributors) {
+    public void setContributors(Set<User> contributors) {
         this.contributors = contributors;
     }
-    public List<Donation> getDonations() {
+    public Set<Donation> getDonations() {
         return donations;
     }
-    public void setDonations(List<Donation> donations) {
+    public void setDonations(Set<Donation> donations) {
         this.donations = donations;
     }
+    public void setBlogPost(BlogPost blogPost) {
+        this.blogPosts.add(blogPost);
+    }
+    public Set<BlogPost> getBlogPosts() {
+        return blogPosts;
+    }
+    public void setMilestone(Milestone milestone) {
+        this.milestones.add(milestone);
+    }
+    public Set<Milestone> getMilestones() {
+        return milestones;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Project)) return false;
+        Project project = (Project) o;
+        return id != null && id.equals(project.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    
+
 }
 

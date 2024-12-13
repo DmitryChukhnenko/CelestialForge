@@ -16,19 +16,39 @@ public class UserService {
 	private UserRepository userRepository;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
-    public User createUser(String username, String email, String password) {
-        User user = new User();
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(passwordEncoder.encode(password));
-        return userRepository.save(user);
-    }
 	
-	public User addUser(User user){
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
-		return userRepository.save(user);
-	}
+	public User addUser(User user) throws IllegalArgumentException {
+        if (userRepository.findOneByUsername(user.getUsername()).isPresent()) 
+        {
+            throw new IllegalArgumentException("Пользователь с таким именем уже существует.");
+        }
+        if (userRepository.findOneByEmail(user.getEmail()).isPresent()) 
+        {
+            throw new IllegalArgumentException("Пользователь с таким email уже существует.");
+        }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+		return user;
+    }
+
+	public User updateUser(User user, User userUpdateDTO) {
+        if (user != null) {
+            if (userUpdateDTO.getUsername() != null && !"basic".equals(userUpdateDTO.getUsername())) {
+                user.setUsername(userUpdateDTO.getUsername());
+            }
+            if (userUpdateDTO.getEmail() != null && !"basic@mail.com".equals(userUpdateDTO.getEmail())) {
+                user.setEmail(userUpdateDTO.getEmail());
+            }
+            if (userUpdateDTO.getPassword() != null && !"basic1".equals(userUpdateDTO.getPassword())) {
+                user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
+            }
+            if (userUpdateDTO.getPictureUrl() != null) {
+                user.setPictureUrl(userUpdateDTO.getPictureUrl());
+            }
+            return userRepository.save(user);
+        }
+        return null;
+    }
 	
 	public User findById(Long id){
 		Optional<User> user = userRepository.findById(id);

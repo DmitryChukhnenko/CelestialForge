@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль пользователя - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <h1>Профиль пользователя</h1>
+        
+        <div class="profile">
+            <div class="profile-picture">
+                <img th:src="@{${user.pictureUrl}}" alt="Profile Picture" class="profile-img"/>
+            </div>
+            
+            <div class="profile-details">
+                <h2>Имя пользователя: <span th:text="${user.username}">Username</span></h2>
+                <p>Email: <span th:text="${user.email}">user@example.com</span></p>
+            </div>
+        </div>
+        
+        <div class="edit-button">
+            <a th:href="@{/user/edit}" class="btn btn-secondary">Редактировать профиль</a>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

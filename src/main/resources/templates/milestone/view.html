@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${milestone.title} + ' - Celestial Forge'">Milestone</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <a th:href="@{/project/{projectId}(projectId=${projectId})}" class="btn btn-secondary">Назад</a>
+        <div class="milestone-details">
+            <h1 th:text="${milestone.title}"></h1>
+            <img th:if="${milestone.pictureUrl != null}" th:src="@{${milestone.pictureUrl}}" alt="Milestone Image" class="milestone-image"/>
+            <p th:text="${milestone.description}"></p>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

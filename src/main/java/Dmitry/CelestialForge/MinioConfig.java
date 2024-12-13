@@ -10,7 +10,7 @@ import io.minio.MinioClient;
 public class MinioConfig {
 
     @Value("${spring.file-storage.url}")
-    private String minioUrl;
+    private String endpoint;
 
     @Value("${spring.file-storage.access-key}")
     private String accessKey;
@@ -21,7 +21,7 @@ public class MinioConfig {
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                .endpoint(minioUrl)
+                .endpoint(endpoint)
                 .credentials(accessKey, secretKey)
                 .build();
     }

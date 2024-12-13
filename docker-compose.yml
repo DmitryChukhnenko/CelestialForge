@@ -1,17 +1,4 @@
 services:  
-  # RabbitMQ
-  rabbitmq:
-    image: "rabbitmq:3-management"
-    container_name: rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USERNAME}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
-      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VIRTUAL_HOST}
-    ports:
-      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}" # Стандартный порт для RabbitMQ
-      - "${RABBITMQ_ADMIN_PORT}:${RABBITMQ_ADMIN_PORT}" # UI для администрирования RabbitMQ 
-    networks:
-      - app-network
 
   # База данных (PostgreSQL)
   db:
@@ -31,34 +18,56 @@ services:
     image: minio/minio
     container_name: minio
     environment:
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      MINIO_HTTP_ADDR: ${MINIO_HTTP_ADDR}
-      MINIO_BROWSER: ${MINIO_BROWSER}
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    command: server /data
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}     
+      # MINIO_BUCKET: ${MINIO_BUCKET} 
+    entrypoint: >
+      /bin/sh -c '
+        isAlive() { curl -sf http://${MINIO_URL}/minio/health/live; }                     # check if Minio is alive
+        minio $0 "$@" --quiet & echo $! > /tmp/minio.pid                                  # start Minio in the background
+        while ! isAlive; do sleep 0.1; done                                               # wait until Minio is alive
+        mc alias set minio http://${MINIO_URL} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}  # setup Minio client
+        mc mb minio/${MINIO_BUCKET}  || true                                              # create a test bucket
+        mc anonymous set public minio/${MINIO_BUCKET}                                     # make the test bucket public
+        kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid                            # stop Minio
+        while isAlive; do sleep 0.1; done                                                 # wait until Minio is stopped
+        exec minio $0 "$@"                                                                # start Minio in the foreground
+      '
+    command: server /data --json --console-address ':9090'
+    ports: ['${MINIO_PORT}:${MINIO_PORT}/tcp', '9090:9090/tcp'] # open http://127.0.0.1:9090 (9000 is the API port)
+    volumes: [minio-data:/data:rw]
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://${MINIO_URL}/minio/health/live']
+      interval: 10s
+      start_interval: 1s
+      start_period: 10s
+    security_opt: [no-new-privileges:true]
+    networks:
+      - app-network
+  
+  # Redis
+  redis:
+    image: redis:latest
+    container_name: redis
     ports:
-      - "${MINIO_PORT}:${MINIO_PORT}"
-    volumes:
-      - minio_data:/data
+      - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
       - app-network
     
   #Spring
-  app:
+  app:    
     build: .
     container_name: spring-boot-app
     env_file:
       - .env
     ports:
-      - "8080:8080"    
+      - "${SPRING_PORT}:${SPRING_PORT}"    
     volumes:
       - ./uploads:/app/uploads    
     depends_on:
       - db
-      - rabbitmq
       - minio
+      - redis
     networks:
       - app-network
 
@@ -71,13 +80,12 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - rabbitmq
       - minio
     networks:
       - app-network
 
 volumes:
-  minio_data:
+  minio-data: {}
 
 networks:
   app-network:

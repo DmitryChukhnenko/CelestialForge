@@ -1,34 +1,42 @@
-package Dmitry.CelestialForge.Services;
+// package Dmitry.CelestialForge.Services;
 
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
+// import java.util.ArrayList;
+// import java.util.Collection;
 
-@Service
-public class CustomUserDetailsService implements UserDetailsService {
+// import org.slf4j.LoggerFactory;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.security.core.GrantedAuthority;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.core.userdetails.UsernameNotFoundException;
+// import org.springframework.stereotype.Service;
 
-    private final UserService userService; // Assume this interacts with your DB
-    @SuppressWarnings("unused")
-    private final PasswordEncoder passwordEncoder;
+// import Dmitry.CelestialForge.Entities.User;
+// import Dmitry.CelestialForge.Repositories.UserRepository;
 
-    public CustomUserDetailsService(UserService userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-    }
+// @Service
+// public class CustomUserDetailsService implements UserDetailsService {
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Dmitry.CelestialForge.Entities.User user = userService.findByEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found with email: " + username);
-        }
+//     @Autowired
+//     private UserRepository userRepository;
 
-        return User.builder()
-                   .username(user.getEmail()) 
-                   .password(user.getPassword()) 
-                   .build();
-    }
-}
+//     @Override
+//     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+//         User user = userRepository.findOneByEmail(email).get();
+//         if(user == null){
+//             throw new UsernameNotFoundException("Пользователь не найден с email: " + email);
+//         }
+//         LoggerFactory.getLogger(CustomUserDetailsService.class).info("Загружен пользователь: " + user.getEmail() + " " + user.getPassword());
+//         return new org.springframework.security.core.userdetails.User(
+//             user.getEmail(),
+//             user.getPassword(),
+//             getAuthorities(user) // Реализуйте метод для получения ролей, если есть
+//         );
+//     }
+
+//     private Collection<? extends GrantedAuthority> getAuthorities(@SuppressWarnings("unused") User user) {
+//         // Пример без ролей
+//         return new ArrayList<>(){};
+//     }
+// }
+

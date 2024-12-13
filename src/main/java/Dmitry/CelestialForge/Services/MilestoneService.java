@@ -19,7 +19,7 @@ public class MilestoneService {
     private MilestoneRepository milestoneRepository;
 
     @Transactional
-    public Milestone addBlogPost(Milestone milestone) {
+    public Milestone addMilestone(Milestone milestone) {
         milestone.setCreatedAt(LocalDateTime.now());
         return milestoneRepository.save(milestone);
     }

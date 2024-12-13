@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Пост: ' + ${blogPost.title} + ' - Celestial Forge'">Пост</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">        
+        <a th:href="@{/project/{projectId}(projectId=${blogPost.project.id})}" class="btn btn-secondary">Назад</a>
+
+        <div class="blog-post">
+            <h1 th:text="${blogPost.title}"></h1>
+            <p class="post-meta">Автор: <span th:text="${blogPost.user.username}"></span> | Дата: <span th:text="${#temporals.format(blogPost.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
+            <img th:if="${blogPost.pictureUrl != null}" th:src="@{${blogPost.pictureUrl}}" alt="Blog Image" class="blog-image"/>
+            <div class="post-content" th:text="${blogPost.content}"></div>
+        </div>
+        
+        <div class="comments-section">
+            <h2>Комментарии</h2>
+            <div th:each="comment : ${blogPost.comments}">
+                <div class="comment">
+                    <p><strong th:text="${comment.user.username}"></strong> <span th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
+                    <p th:text="${comment.content}"></p>
+                    <form th:action="@{/project/{projectId}/blog/{blogPostId}/comments/like(projectId=${blogPost.project.id}, blogPostId=${blogPost.id})}" method="post">
+                        <input type="hidden" name="commentId" th:value="${comment.id}"/>
+                        <button type="submit" class="btn btn-secondary">Нравится</button>
+                    </form>
+                </div>
+            </div>
+            <a th:href="@{/project/{projectId}/blog/{blogPostId}/comments/create(projectId=${blogPost.project.id}, blogPostId=${blogPost.id})}" class="btn btn-primary">Добавить комментарий</a>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

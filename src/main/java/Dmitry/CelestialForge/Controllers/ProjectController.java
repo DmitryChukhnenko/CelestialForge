@@ -10,10 +10,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import Dmitry.CelestialForge.Entities.Project;
+import Dmitry.CelestialForge.Entities.User;
 import Dmitry.CelestialForge.Services.DonationService;
-import Dmitry.CelestialForge.Services.MilestoneService;
 import Dmitry.CelestialForge.Services.ProjectService;
 import Dmitry.CelestialForge.Session.SessionService;
 
@@ -26,49 +27,54 @@ public class ProjectController {
     @Autowired
     private DonationService donationService;
     @Autowired
-    private MilestoneService milestoneService;
-    @Autowired
     private SessionService sessionService;
 
-    @GetMapping("/")
+    @GetMapping
     public String listProjects(Model model) {
-        List<Project> projects = projectService.findByUser(sessionService.getUser());
+        List<Project> projects = projectService.findAll(); // Реализуйте метод findAll в сервисе
         model.addAttribute("projects", projects);
         return "project/list";
     }
 
     @GetMapping("/create")
     public String createProjectForm(Model model) {
+        model.addAttribute("project", new Project());
         return "project/create";
     }
 
     @PostMapping("/create")
     public String createProject(@ModelAttribute Project project) {
-        project.setUser(sessionService.getUser());
+        User user = sessionService.getUser();
+        project.setUser(user);
+        project.getContributors().add(user);
         projectService.addProject(project);
-        return "redirect:/project/";
+        return "redirect:/project/" + project.getId();
     }
 
     @GetMapping("/{id}")
     public String viewProject(@PathVariable Long id, Model model) {
-        Project project = projectService.findById(id);
-        // TODO: Вот тут кешируем проект
-        model.addAttribute("project", project);
-        model.addAttribute("milestones", milestoneService.findByProject(project));
-        return "project/view";
+        Project project = projectService.findWithAll(id);
+        if (project != null) {
+            model.addAttribute("project", project);
+            model.addAttribute("isOwnerOrContributor", projectService.isOwnerOrContributor(project, sessionService.getUser()));
+            return "project/view";            
+        }
+        return "redirect:/project";
     }
 
     @GetMapping("/{id}/donate")
     public String donateToProjectForm(@PathVariable Long id, Model model) {
-        Project project = projectService.findById(id);
-        model.addAttribute("project", project);
-        return "project/view/donate";
+        Project project = projectService.findWithAll(id);
+        if (project != null) {
+            model.addAttribute("project", project);
+            return "project/donate";        
+        }
+        return "redirect:/project";        
     }
 
     @PostMapping("/{id}/donate")
-    public String donateToProject(@PathVariable Long id, @ModelAttribute Double amount) {
-        donationService.donateToProject(sessionService.getUser(), projectService.findById(id), amount);
-        return "redirect:/project/view";
+    public String donateToProject(@PathVariable Long id, @RequestParam Double amount) {
+        donationService.donateToProject(sessionService.getUser(), id, amount);
+        return "redirect:/project/" + id;
     }
 }
-

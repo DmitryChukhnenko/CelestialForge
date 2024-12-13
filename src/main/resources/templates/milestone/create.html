@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Создать Milestone - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <a th:href="@{/project/{projectId}(projectId=${project.id})}" class="btn btn-secondary">Назад</a>
+        <div class="form-container">
+            <h1>Создать Milestone для проекта <span th:text="${project.title}"></span></h1>
+            <form action="#" th:action="@{/project/{projectId}/milestone/create(projectId=${project.id})}" th:object="${milestone}" method="post" enctype="multipart/form-data" class="form">
+                <div>
+                    <label for="title">Заголовок:</label>
+                    <input type="text" th:field="*{title}" id="title" required>
+                </div>
+                <div>
+                    <label for="description">Описание:</label>
+                    <textarea th:field="*{description}" id="description" required></textarea>
+                </div>
+                <div>
+                    <label for="image">Загрузить изображение:</label>
+                    <input type="file" id="image" name="image" accept="image/*" />
+                </div>
+                <button type="submit" class="btn btn-primary">Создать</button>
+            </form>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

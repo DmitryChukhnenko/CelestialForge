@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Проекты - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <h1>Мои Проекты</h1>
+        <div>
+            <a th:href="@{/project/create}" class="btn btn-primary">Создать Новый Проект</a>
+        </div>
+        <div class="projects-list">
+            <ul>
+                <li th:each="project : ${projects}">
+                    <a th:href="@{/project/{id}(id=${project.id})}" th:text="${project.title}"></a>
+                    <p>Собрано: <span th:text="${project.raisedAmount}"></span> из <span th:text="${project.targetAmount}"></span></p>
+                </li>
+            </ul>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

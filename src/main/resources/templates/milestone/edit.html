@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Редактировать Milestone: ' + ${milestone.title} + ' - Celestial Forge'">Редактировать Milestone</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <a th:href="@{/project/{projectId}/milestone/{id}(projectId=${milestone.project.id}, id=${milestone.id})}" class="btn btn-secondary">Назад</a>        
+        <div class="form-container">
+            <h1 th:text="'Редактировать Milestone: ' + ${milestone.title}"></h1>
+            <form th:action="@{/project/{projectId}/milestone/{id}/edit(projectId=${milestone.project.id}, id=${milestone.id})}" 
+                  th:object="${milestone}" method="post" enctype="multipart/form-data" class="form">
+                <div>
+                    <label for="title">Заголовок:</label>
+                    <input type="text" th:field="*{title}" id="title" required>
+                </div>
+                <div>
+                    <label for="description">Описание:</label>
+                    <textarea th:field="*{description}" id="description" required></textarea>
+                </div>
+                <div>
+                    <label for="image">Загрузить изображение:</label>
+                    <input type="file" id="image" name="image" accept="image/*" />
+                </div>
+                <div th:if="${milestone.pictureUrl != null}">
+                    <p>Текущее изображение:</p>
+                    <img th:src="@{${milestone.pictureUrl}}" alt="Milestone Image" class="milestone-image"/>
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

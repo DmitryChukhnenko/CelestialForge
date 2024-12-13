@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать профиль - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <h1>Редактировать профиль</h1>
+        <a th:href="@{/user}" class="btn btn-secondary">Назад</a>
+        
+        <div class="profile">
+            <div>
+                <div class="profile-picture">
+                    <img th:src="@{${user.pictureUrl}}" alt="Profile Picture" class="profile-img"/>
+                </div>
+                <form action="#" th:action="@{/upload/user/{id}/image(id=${user.id})}" method="post" enctype="multipart/form-data" class="form">
+                    <label for="image">Загрузить изображение профиля:</label>
+                    <input type="file" id="image" name="image" accept="image/*" />
+                    <button type="submit" class="btn btn-primary">Загрузить</button>
+                </form>
+            </div>            
+            
+            <div class="profile-details">
+                <form action="#" th:action="@{/user/edit}" th:object="${user}" method="post" class="form">
+                    <div>
+                        <div th:if="${#fields.hasErrors('username')}" class="error-message">
+                            <p th:errors="*{username}"></p>
+                        </div>
+                        <label for="username">Имя пользователя:</label>
+                        <input th:field="*{username}" name="username" id="username" required>	
+                    </div>		
+            
+                    <div>
+                        <div th:if="${#fields.hasErrors('email')}" class="error-message">
+                            <p th:errors="*{email}"></p>
+                        </div>
+                        <label for="email">Email:</label>
+                        <input th:field="*{email}" name="email" id="email" type="email" required>	
+                    </div>
+            
+                    <div>
+                        <div th:if="${#fields.hasErrors('password')}" class="error-message">
+                            <p th:errors="*{password}"></p>
+                        </div>
+                        <label for="password">Пароль:</label>
+                        <input type="password" th:field="*{password}" name="password" id="password" required>	
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

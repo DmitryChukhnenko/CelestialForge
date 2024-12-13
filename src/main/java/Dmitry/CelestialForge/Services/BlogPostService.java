@@ -25,16 +25,19 @@ public class BlogPostService {
         return blogPostRepository.save(blogPost);
     }
 
+    @Transactional(readOnly = true)
     public BlogPost findById(Long id){
 		Optional<BlogPost> blogPost = blogPostRepository.findById(id);
 		if(blogPost.isPresent()) return blogPost.get();
 		return null;
 	}
 
+    @Transactional(readOnly = true)
     public List<BlogPost> findByProject(Project project) {
         return blogPostRepository.findByProject(project);
     }
 
+    @Transactional(readOnly = true)
     public List<BlogPost> findByUser(User user) {
         return blogPostRepository.findByUser(user);
     }

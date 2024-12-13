@@ -1,29 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-<link th:href="@{/css/style.css}" rel="stylesheet" type="text/css">
+    <meta charset="UTF-8">
+    <title>Регистрация - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<div>
-	<form action="#" th:action="@{/registration}" th:object="${user}" method="post" class="form">
-		<div>
-			<label for="username">Username:</label>
-			<input th:field="*{username}" name="username" id="username">	
-		</div>		
-		<div>
-			<label for="email">Email:</label>
-			<input th:field="*{email}" name="email" id="email">	
-		</div>
-		<div>
-			<label for="password">Password:</label>
-			<input type="password" th:field="*{password}" name="password" id="password">	
-		</div>
-		<div>
-			<button>Submit</button>
-		</div>
-	</form>
-</div>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <div class="form-container">
+            <h2>Регистрация</h2>
+            <form action="#" th:action="@{/registration}" th:object="${user}" method="post" enctype="multipart/form-data" class="form">
+                <div>
+                    <div th:if="${#fields.hasErrors('username')}" class="error-message">
+                        <p th:errors="*{username}"></p>
+                    </div>
+                    <label for="username">Имя пользователя:</label>
+                    <input th:field="*{username}" name="username" id="username" type="text" quired>
+                </div>		
+
+                <div>
+                    <div th:if="${#fields.hasErrors('email')}" class="error-message">
+                        <p th:errors="*{email}"></p>
+                    </div>
+                    <label for="email">Email:</label>
+                    <input th:field="*{email}" name="email" id="email" type="email" required>
+                </div>
+
+                <div>
+                    <div th:if="${#fields.hasErrors('password')}" class="error-message">
+                        <p th:errors="*{password}"></p>
+                    </div>
+                    <label for="password">Пароль:</label>
+                    <input type="password" th:field="*{password}" name="password" id="password" required>
+                </div>
+
+                <div>
+                    <label for="image">Загрузить изображение профиля:</label>
+                    <input type="file" id="image" name="image" accept="image/*" />
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+            </form>
+        </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

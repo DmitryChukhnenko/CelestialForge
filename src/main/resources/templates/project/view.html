@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${project.title} + ' - Celestial Forge'">Проект</title>   
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <!-- Bootstrap CSS -->
+    <link 
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+        crossorigin="anonymous">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- Optional Bootstrap JavaScript and dependencies -->
+    <script 
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous">
+    </script>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <main class="main-content container my-4">
+        <div class="project-details mb-4">
+            <h1 th:text="${project.title}"></h1>
+            <img th:if="${project.pictureUrl != null}" th:src="@{${project.pictureUrl}}" alt="Project Image" class="img-fluid rounded mb-3"/>
+            <p th:text="${project.description}"></p>
+            <p><strong>Целевая сумма:</strong> <span th:text="${project.targetAmount}"></span></p>
+            <p><strong>Собрано:</strong> <span th:text="${project.raisedAmount}"></span></p>
+            <p><strong>Дата окончания:</strong> 
+                <span th:text="${project.endTime != null} ? ${#temporals.format(project.endTime, 'dd.MM.yyyy HH:mm')} : 'Не установлена'"></span>
+            </p>            
+
+            <div class="mb-3">
+                <a th:href="@{/project/{id}/donate(id=${project.id})}" class="btn btn-primary">Пожертвовать</a>
+                <a th:if="${isOwnerOrContributor}" th:href="@{/project/{id}/milestone/create(id=${project.id})}" class="btn btn-secondary">Создать Milestone</a>
+                <a th:if="${isOwnerOrContributor}" th:href="@{/project/{id}/blog/create(id=${project.id})}" class="btn btn-secondary">Создать BlogPost</a>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs" id="projectTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="contributors-tab" data-bs-toggle="tab" data-bs-target="#contributors" type="button" role="tab" aria-controls="contributors" aria-selected="true">Контрибьюторы</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="donations-tab" data-bs-toggle="tab" data-bs-target="#donations" type="button" role="tab" aria-controls="donations" aria-selected="false">Пожертвования</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="blogposts-tab" data-bs-toggle="tab" data-bs-target="#blogposts" type="button" role="tab" aria-controls="blogposts" aria-selected="false">Посты в блоге</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="milestones-tab" data-bs-toggle="tab" data-bs-target="#milestones" type="button" role="tab" aria-controls="milestones" aria-selected="false">Милестоны</button>
+            </li>
+        </ul>
+        <div class="tab-content" id="projectTabContent">
+            <!-- Вкладка Контрибьюторы -->
+            <div class="tab-pane fade show active p-3" id="contributors" role="tabpanel" aria-labelledby="contributors-tab">
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="contributor : ${project.contributors}">
+                        <div class="d-flex align-items-center">
+                            <img th:src="@{${contributor.pictureUrl}}" alt="Contributor Image" class="rounded-circle me-3" width="50" height="50"/>
+                            <span th:text="${contributor.username}"></span>
+                        </div>
+                    </li>
+                </ul>
+                <div th:if="${#lists.isEmpty(project.contributors)}" class="mt-3">
+                    <p>Нет контрибьюторов для этого проекта.</p>
+                </div>
+            </div>
+
+            <!-- Вкладка Пожертвования -->
+            <div class="tab-pane fade p-3" id="donations" role="tabpanel" aria-labelledby="donations-tab">
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="donation : ${project.donations}">
+                        <div>
+                            <strong>Пользователь:</strong> 
+                            <span th:if="${donation.user != null}" th:text="${donation.user.username}"></span>
+                            <span th:if="${donation.user == null}">Неизвестно</span>
+                        </div>
+                        <div>
+                            <strong>Сумма:</strong> <span th:text="${donation.amount}"></span>
+                        </div>
+                    </li>
+                </ul>
+                <div th:if="${#lists.isEmpty(project.donations)}" class="mt-3">
+                    <p>Нет пожертвований для этого проекта.</p>
+                </div>
+            </div>
+
+            <!-- Вкладка Посты в блоге -->
+            <div class="tab-pane fade p-3" id="blogposts" role="tabpanel" aria-labelledby="blogposts-tab">
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="blogPost : ${project.blogPosts}">
+                        <h5 th:text="${blogPost.title}"></h5>
+                        <p th:text="${blogPost.content}"></p>
+                        <img th:if="${blogPost.pictureUrl != null}" th:src="@{${blogPost.pictureUrl}}" alt="Blog Image" class="img-fluid rounded mb-2"/>
+                        <p>
+                            <strong>Автор:</strong> <span th:text="${blogPost.user.username}"></span> | 
+                            <strong>Дата:</strong> <span th:text="${#temporals.format(blogPost.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+                        </p>                        
+                        <a th:href="@{/project/{projectId}/blog/{id}(projectId=${blogPost.project.id}, id=${blogPost.id})}" class="btn btn-secondary">Подробнее</a>
+                    </li>
+                </ul>
+                <div th:if="${#lists.isEmpty(project.blogPosts)}" class="mt-3">
+                    <p>Нет постов в блоге для этого проекта.</p>
+                </div>
+            </div>
+
+            <!-- Вкладка Милестоны -->
+            <div class="tab-pane fade p-3" id="milestones" role="tabpanel" aria-labelledby="milestones-tab">
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="milestone : ${project.milestones}">
+                        <h5 th:text="${milestone.title}"></h5>
+                        <p th:text="${milestone.description}"></p>
+                        <img th:if="${milestone.pictureUrl != null}" th:src="@{${milestone.pictureUrl}}" alt="Milestone Image" class="img-fluid rounded mb-2"/>
+                        <p>
+                            <strong>Дата создания:</strong> <span th:text="${#temporals.format(milestone.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+                        </p>
+                        <a th:href="@{/project/{projectId}/milestone/{id}(projectId=${milestone.project.id}, id=${milestone.id})}" class="btn btn-secondary">Подробнее</a>
+                    </li>
+                </ul>
+                <div th:if="${#lists.isEmpty(project.milestones)}" class="mt-3">
+                    <p>Нет милестонов для этого проекта.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

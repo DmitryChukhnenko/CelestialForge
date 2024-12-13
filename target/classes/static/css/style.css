@@ -1,60 +1,245 @@
-@charset "UTF-8";
-
-* {
-    font-family: Arial, sans-serif;
-    background-color: #090C24;
-    color: #FFFFFF;
-    text-decoration: none;
-}
-
-form {
-	width: 20%;
-	display: flex;
-	flex-direction: column;
-	align-self: center;
-}
-
-input, label, a, button {
-	margin: 5px;	
-}
-
-button, input {
-	border: none;
-	border-radius: 5%;
-}
-
-body {    
+/* Общие стили */
+body {
     margin: 0;
-    padding: 0;
-}
-
-.container {
-    margin: 20px;
-}
-
-h1 {
-    color: #FFC91C;
+    font-family: Arial, sans-serif;
+    background-color: #090C24; /* Цвет фона проекта */
+    color: #FFFFFF; /* Основной текст остаётся белым для контраста */
 }
 
 a {
-    color: #3BAEEB;
+    color: #3BAEEB; /* Голубой акцент */
     text-decoration: none;
 }
 
 a:hover {
-    color: #EAA222;
+    color: #FFC91C; /* Жёлтый акцент при наведении */
 }
 
+.container, .main-content {
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background-color: #7626B1; /* Не выделяющийся акцент */
+    padding: 10px 20px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFC91C; /* Жёлтый акцент */
+}
+
+.navbar-menu {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.navbar-menu li a {
+    color: #FFFFFF; /* Белый цвет ссылок */
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.navbar-menu li a:hover {
+    background-color: #3BAEEB; /* Голубой акцент при наведении */
+}
+
+/* Footer */
+footer {
+    background-color: #7626B1; /* Не выделяющийся акцент */
+    padding: 20px;
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    box-sizing: border-box;
+}
+
+.footer-content p {
+    margin: 0;
+    color: #FFFFFF; /* Белый текст */
+}
+
+.social-links {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.social-links li a {
+    color: #3BAEEB; /* Голубые ссылки */
+}
+
+.social-links li a:hover {
+    color: #FFC91C; /* Жёлтые акценты при наведении */
+}
+
+/* Кнопки */
 .btn {
-    padding: 10px 15px;
-    background-color: #FFC91C;
-    color: #090C24;
+    display: inline-block;
+    padding: 10px 20px;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
-    text-decoration: none;
 }
 
-.btn:hover {
-    background-color: #EAA222;
+.btn-primary {
+    background-color: #FFC91C; /* Жёлтая кнопка */
+    color: #090C24; /* Тёмный текст для контраста */
 }
-/* TODO: #F84158 Его куда-то надо */
+
+.btn-primary:hover {
+    background-color: #EAA222; /* Тёмно-жёлтый при наведении */
+}
+
+.btn-secondary {
+    background-color: #3BAEEB; /* Голубая кнопка */
+    color: #FFFFFF; /* Белый текст */
+}
+
+.btn-secondary:hover {
+    background-color: #F84158; /* Красная кнопка при наведении */
+}
+
+/* Формы */
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form label {
+    font-weight: bold;
+}
+
+.form input[type="text"],
+.form input[type="email"],
+.form input[type="password"],
+.form input[type="number"],
+.form input[type="datetime-local"],
+.form textarea {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    background-color: #1E1E3F; /* Тёмный фон для полей ввода */
+    color: #FFFFFF; /* Белый текст */
+}
+
+.form textarea {
+    resize: vertical;
+    height: 100px;
+}
+
+.error-message {
+    color: #F84158; /* Красный цвет для сообщений об ошибках */
+    font-weight: bold;
+}
+
+/* Профиль */
+.profile {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.profile-picture {
+    flex-shrink: 0;
+}
+
+.profile-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.profile-details {
+    flex-grow: 1;
+}
+
+/* Проекты */
+.projects-list, .blog-posts, .comments-list, .donations {
+    margin-top: 20px;
+}
+
+.project-card, .blog-post, .comment, .donation {
+    background-color: #1E1E3F; /* Тёмный фон карточек */
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.project-image, .blog-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+/* Кнопки */
+button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #FFC91C; /* Жёлтая кнопка по умолчанию */
+    color: #090C24;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #EAA222; /* Тёмно-жёлтая кнопка при наведении */
+}
+
+/* Отображение комментариев */
+.comments-section .comment {
+    background-color: #1E1E3F;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+/* Основной контент */
+.main-content {
+    padding-bottom: 60px; /* Отступ снизу для фиксированного footer */
+}
+
+.list-group-item {
+    background-color: #1E1E3F;
+    color: #FFC91C;
+}
+
+/* Медиазапросы */
+@media (max-width: 768px) {
+    .navbar-menu {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .profile {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    footer {
+        position: relative;
+    }
+}

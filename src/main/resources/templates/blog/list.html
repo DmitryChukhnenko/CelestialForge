@@ -2,22 +2,28 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Blog Posts</title>
+    <title>Блоги - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-    <div class="container">
-        <h1>Blog Posts</h1>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <h1>Блоги</h1>
         <div>
-            <a href="/blog/create" class="btn btn-primary">Create New Blog Post</a>
+            <a th:href="@{/project/{projectId}/blog/create(projectId=${projectId})}" class="btn btn-primary">Создать Новый Пост</a>
         </div>
         <div class="blog-posts">
             <ul>
                 <li th:each="blogPost : ${blogPosts}">
-                    <a th:href="@{/blog/{id}(id=${blogPost.id})}" th:text="${blogPost.title}"></a>
+                    <a th:href="@{/project/{projectId}/blog/{id}(projectId=${blogPost.project.id}, id=${blogPost.id})}" th:text="${blogPost.title}"></a>
+                    <p th:text="${#dates.format(blogPost.createdAt, 'dd.MM.yyyy HH:mm')}"></p>
                 </li>
             </ul>
         </div>
-    </div>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

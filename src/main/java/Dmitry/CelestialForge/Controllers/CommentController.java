@@ -1,5 +1,7 @@
 package Dmitry.CelestialForge.Controllers;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import Dmitry.CelestialForge.Entities.BlogPost;
 import Dmitry.CelestialForge.Entities.Comment;
@@ -17,7 +20,7 @@ import Dmitry.CelestialForge.Services.LikeService;
 import Dmitry.CelestialForge.Session.SessionService;
 
 @Controller
-@RequestMapping("/blog/{blogPostId}/comments")
+@RequestMapping("/project/{projectId}/blog/{blogPostId}/comments")
 public class CommentController {
 
     @Autowired
@@ -29,30 +32,34 @@ public class CommentController {
     @Autowired
     private LikeService likeService;
 
-    @GetMapping("/")
-    public String listComments(@PathVariable Long blogPostId, Model model) {
-        BlogPost blogPost = blogPostService.findById(blogPostId);
-        // TODO: Подумай о кешировании блог поста
-        model.addAttribute("comments", commentService.findByBlogPost(blogPost));
-        return "comment/list";
-    }
-
     @GetMapping("/create")
-    public String createCommentForm(@PathVariable Long blogPostId, Model model) {
+    public String createCommentForm(@PathVariable Long projectId, @PathVariable Long blogPostId, Model model) {
         model.addAttribute("blogPost", blogPostService.findById(blogPostId));
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("comment", new Comment());
         return "comment/create";
     }
 
     @PostMapping("/create")
-    public String createBlogPost(@ModelAttribute BlogPost blogPost) {
-        blogPost.setUser(sessionService.getUser());
-        blogPostService.addBlogPost(blogPost);
-        return "redirect:/comments/";
+    public String createComment(@PathVariable Long projectId, @PathVariable Long blogPostId, @ModelAttribute Comment comment) {
+        BlogPost blogPost = blogPostService.findById(blogPostId);
+        comment.setUser(sessionService.getUser());
+        comment.setBlogPost(blogPost);
+        comment.setCreatedAt(LocalDateTime.now());
+        commentService.addComment(comment);
+        return "redirect:/project/" + projectId + "/blog/" + blogPostId;
     }
 
     @PostMapping("/like")
-    public String likeComment(@ModelAttribute Comment comment) {
-        likeService.addLikeToComment(sessionService.getUser(), comment);
-        return "redirect:/comments/";
+    public String likeComment(@PathVariable Long projectId, @PathVariable Long blogPostId, @RequestParam Long commentId) {
+        Comment comment = commentService.findById(commentId);
+        if (comment != null) {
+            likeService.addLikeToComment(sessionService.getUser(), comment);
+            BlogPost blogPost = comment.getBlogPost();
+            if (blogPost != null) 
+                return "redirect:/project/" + projectId + "/blog/" + blogPostId;
+        }
+        return "redirect:";
     }
 }
+

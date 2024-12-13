@@ -1,7 +1,5 @@
 package Dmitry.CelestialForge.Services;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.InvalidKeyException;
@@ -10,91 +8,80 @@ import java.security.NoSuchAlgorithmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import io.minio.BucketExistsArgs;
-import io.minio.GetObjectArgs;
+import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
-import io.minio.StatObjectArgs;
-import io.minio.errors.ErrorResponseException;
 import io.minio.errors.MinioException;
+import io.minio.http.Method;
 
 @Service
 public class FileStorageService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
-    private final MinioClient minioClient;
-
     @Autowired
-    public FileStorageService(MinioClient minioClient) {
-        this.minioClient = minioClient;
-        try {
-            String bucketName = "test-bucket";
-            // Проверяем, существует ли бакет, если нет, то создаем
-            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-                logger.info("Test bucket created successfully.");
-            } else {
-                logger.info("Test bucket already exists.");
-            }
-        } catch (MinioException e) {
-            logger.error("Error connecting to MinIO: {}", e.getMessage());
-        } catch (Exception e) {
-            logger.error("Unexpected error: {}", e.getMessage());
+    private MinioClient minioClient;
+
+    @Value("${minio.bucket}")
+    private String bucketName;
+
+    private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);    
+
+    public static void createBucketIfNotExists(MinioClient minioClient, String bucketName) throws MinioException, InvalidKeyException, NoSuchAlgorithmException, IllegalArgumentException, IOException {
+        boolean isExist = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
+        if (!isExist) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
         }
     }
 
-    // Загрузка файла в MinIO
-    public void uploadFile(String bucketName, String objectName, String filePath) throws MinioException, IOException, InvalidKeyException, NoSuchAlgorithmException {
-        // Проверяем существует ли бакет
-        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
-            // Если бакет не существует, создаем его
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+    public String getBaseUrl(String fullUrl) {
+        logger.info(fullUrl);
+        int queryIndex = fullUrl.indexOf("?");
+        if (queryIndex != -1) {
+            return fullUrl.substring(0, queryIndex).replace("minio:9000", "localhost/files");
+        }
+        return fullUrl;
+    }
+    
+    public String uploadFile(MultipartFile file, String entityType, Long entityId) throws MinioException, IOException, InvalidKeyException, NoSuchAlgorithmException {
+        logger.info("Starting file upload for entityType: {}, entityId: {}", entityType, entityId);
+        
+        try {
+            createBucketIfNotExists(minioClient, bucketName);            
+        } catch (MinioException e) {
+            logger.error("Error opening MinIO bucket", e);
+            throw e;
         }
 
-        // Создаем поток для файла
-        try (FileInputStream fileInputStream = new FileInputStream(new File(filePath))) {
-            // Загружаем файл
+        String fileName = entityType + "/" + entityId + "/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+        logger.info("File name: {}, File size: {}", fileName, file.getSize());
+        
+        try (InputStream fileInputStream = file.getInputStream()) {
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucketName)
-                    .object(objectName)
+                    .object(fileName)
                     .stream(fileInputStream, fileInputStream.available(), -1)
                     .build()
             );
-        }
-    }
+            logger.info("File was put");
+            
+            return getBaseUrl(
+                minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                .method(Method.GET)
+                .bucket(bucketName)
+                .object(fileName)
+                .build()
+            ));
 
-    // Получение файла из MinIO
-    public InputStream getFile(String bucketName, String objectName) throws MinioException, IOException, InvalidKeyException, NoSuchAlgorithmException {
-        return minioClient.getObject(
-            GetObjectArgs.builder()
-            .bucket(bucketName)
-            .object(objectName)
-            .build()
-        );
-    }
-
-    // Удаление файла из MinIO
-    public void deleteFile(String bucketName, String objectName) throws MinioException, IOException, InvalidKeyException, NoSuchAlgorithmException {
-        minioClient.removeObject(
-            RemoveObjectArgs.builder()
-            .bucket(bucketName)
-            .object(objectName)
-            .build()
-        );
-    }
-
-    // Проверка существования файла
-    public boolean doesFileExist(String bucketName, String objectName) throws MinioException, IOException, InvalidKeyException, NoSuchAlgorithmException {
-        try {
-            minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
-            return true;
-        } catch (ErrorResponseException e) {
-            return false;
-        }
+        } catch (Exception e) {
+            logger.error("Error uploading file to MinIO", e);
+            throw e;
+        }        
     }
 }

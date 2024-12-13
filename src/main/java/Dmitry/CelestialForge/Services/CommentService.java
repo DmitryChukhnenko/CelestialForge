@@ -1,6 +1,5 @@
 package Dmitry.CelestialForge.Services;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,13 +19,7 @@ public class CommentService {
     private CommentRepository commentRepository;
 
     @Transactional
-    public Comment addComment(BlogPost blogPost, User user, String content) {
-        Comment comment = new Comment();
-        comment.setContent(content);
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setBlogPost(blogPost);
-        comment.setUser(user);
-
+    public Comment addComment(Comment comment) {
         return commentRepository.save(comment);
     }
 

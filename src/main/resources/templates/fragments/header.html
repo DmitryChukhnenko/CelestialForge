@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:src="@{/js/main.js}"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <a th:href="@{/}" class="brand-logo">Celestial Forge</a>
+            </div>
+            <ul class="navbar-menu">
+                <li><a th:href="@{/project}">Проекты</a></li>
+                <li><a th:href="@{/user}">Профиль</a></li>
+                <li><a th:href="@{/logout}">Выйти</a></li>
+            </ul>
+        </nav>
+    </header>
+</body>
+</html>

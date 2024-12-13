@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить комментарий - Celestial Forge</title>
+    <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <main class="main-content">
+        <a th:href="@{/project/{projectId}(projectId=${projectId})}" class="btn btn-secondary">Назад</a>
+        <h1>Добавить комментарий к посту: <span th:text="${blogPost.title}"></span></h1>
+        <form action="#" th:action="@{/project/{projectId}/blog/{blogPostId}/comments/create(blogPostId=${blogPost.id}, projectId=${projectId})}" th:object="${comment}" method="post" class="form">
+            <div>
+                <label for="content">Комментарий:</label>
+                <textarea th:field="*{content}" id="content" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
+    </main>
+    
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

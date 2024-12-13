@@ -27,7 +27,7 @@ public class Milestone implements Serializable{
 
     private String title;
     private String description;
-    private String pictureUrl;  // Ссылка на изображение в S3
+    private String pictureUrl; 
     private LocalDateTime createdAt;
 
     @ManyToOne

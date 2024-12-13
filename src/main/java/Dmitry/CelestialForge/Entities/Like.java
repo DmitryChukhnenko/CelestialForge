@@ -31,12 +31,10 @@ public class Like implements Serializable{
     @JoinColumn(name = "user_id")
     private User user; 
 
-    // Если лайк относится к посту, то будет заполнено поле blogPost.
     @ManyToOne
     @JoinColumn(name = "blog_post_id", nullable = true)
     private BlogPost blogPost; 
 
-    // Если лайк относится к комментариям, то будет заполнено поле comment.
     @ManyToOne
     @JoinColumn(name = "comment_id", nullable = true)
     private Comment comment;

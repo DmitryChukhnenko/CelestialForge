@@ -43,8 +43,8 @@ public class User implements Serializable{
     @Pattern(regexp = ".*\\d.*", message = "Пароль должен содержать хотя бы одну цифру.")
     private String password;
 
-    private String socialNetworks; // json
-    private String pictureUrl;  // Ссылка на изображение в S3
+    private String socialNetworks; 
+    private String pictureUrl;
     
     @OneToMany(mappedBy = "user")
     private Set<Project> projects = new HashSet<>();

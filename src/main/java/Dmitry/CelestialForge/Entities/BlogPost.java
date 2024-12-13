@@ -32,7 +32,7 @@ public class BlogPost implements Serializable{
 
     private String title;
     private String content;
-    private String pictureUrl;  // Ссылка на изображение в S3
+    private String pictureUrl; 
     private LocalDateTime createdAt;
 
     @ManyToOne

@@ -31,7 +31,7 @@ public class ProjectController {
 
     @GetMapping
     public String listProjects(Model model) {
-        List<Project> projects = projectService.findAll(); // Реализуйте метод findAll в сервисе
+        List<Project> projects = projectService.findAll();
         model.addAttribute("projects", projects);
         return "project/list";
     }

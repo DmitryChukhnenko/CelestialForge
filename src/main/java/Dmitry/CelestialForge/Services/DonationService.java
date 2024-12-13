@@ -25,22 +25,19 @@ public class DonationService {
 
     @Transactional
     public Donation donateToProject(User user, Long projectId, Double amount) {        
-        // Загружаем проект из базы данных
+        
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new EntityNotFoundException("Проект не найден"));
 
-        // Создаем новое пожертвование
         Donation donation = new Donation();
         donation.setUser(user);
         donation.setProject(project);
         donation.setAmount(amount);
 
-        // Обновляем сумму собранных средств
         project.setRaisedAmount(project.getRaisedAmount() + amount);
 
-        // Сохраняем пожертвование и обновленный проект
         donationRepository.save(donation);
-        projectRepository.save(project); // Явно сохраняем изменения проекта
+        projectRepository.save(project);
 
         return donation;
     }

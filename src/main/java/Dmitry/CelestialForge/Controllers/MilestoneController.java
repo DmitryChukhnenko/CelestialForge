@@ -71,8 +71,8 @@ public class MilestoneController {
 
         milestone.setProject(project);
         milestoneService.addMilestone(milestone);
-        project.setMilestone(milestone); // Обновление связи
-        projectService.addProject(project); // Сохранение проекта с новым Milestone
+        project.setMilestone(milestone); 
+        projectService.addProject(project);
         return "redirect:/project/" + projectId;
     }
 

@@ -48,7 +48,6 @@ public class FileUploadController {
                               @RequestParam("image") MultipartFile image,
                               HttpServletRequest request) {
         try {
-            // Загружаем изображение в MinIO
             String imageUrl = fileStorageService.uploadFile(image, entityType, entityId);
             logger.info("Получен URL изображения: {}", imageUrl);
 
@@ -57,7 +56,7 @@ public class FileUploadController {
                     User user = userService.findById(entityId);
                     if (user != null) {
                         user.setPictureUrl(imageUrl);
-                        userService.updateUser(user, new User(entityId, imageUrl)); // Сохраняем обновленного пользователя
+                        userService.updateUser(user, new User(entityId, imageUrl));
                         logger.info("Сохранён пользователь: {}", user.toString());
                     } else {
                         throw new IllegalArgumentException("Пользователь с ID " + entityId + " не найден");
@@ -67,7 +66,7 @@ public class FileUploadController {
                     BlogPost blogPost = blogPostService.findById(entityId);
                     if (blogPost != null) {
                         blogPost.setPictureUrl(imageUrl);
-                        blogPostService.addBlogPost(blogPost); // Сохраняем обновленный пост блога
+                        blogPostService.addBlogPost(blogPost);
                     } else {
                         throw new IllegalArgumentException("BlogPost с ID " + entityId + " не найден");
                     }
@@ -76,7 +75,7 @@ public class FileUploadController {
                     Milestone milestone = milestoneService.findById(entityId);
                     if (milestone != null) {
                         milestone.setPictureUrl(imageUrl);
-                        milestoneService.addMilestone(milestone); // Сохраняем обновленный Milestone
+                        milestoneService.addMilestone(milestone); 
                     } else {
                         throw new IllegalArgumentException("Milestone с ID " + entityId + " не найден");
                     }
@@ -84,13 +83,13 @@ public class FileUploadController {
                 default -> throw new IllegalArgumentException("Сущность с типом " + entityType + " не найдена");
             }
 
-            return "redirect:" + request.getHeader("Referer"); // Перенаправление на предыдущую страницу
+            return "redirect:" + request.getHeader("Referer");
 
         } catch (MinioException | IOException e) {
             logger.error(e.getMessage());
             return "error";
         } catch (IllegalArgumentException | InvalidKeyException | NoSuchAlgorithmException e) {
-            return "error"; // Общая ошибка
+            return "error";
         }
     }
 }

@@ -19,7 +19,7 @@ public class SessionService {
         if (auth == null || !auth.isAuthenticated() || auth.getPrincipal().equals("anonymousUser")) {
             return null;
         }
-        String email = auth.getName(); // Убедитесь, что auth.getName() возвращает email
+        String email = auth.getName(); 
         return userService.findByEmail(email);
     }
 }

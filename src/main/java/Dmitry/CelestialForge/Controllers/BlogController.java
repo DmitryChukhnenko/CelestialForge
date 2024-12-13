@@ -84,8 +84,8 @@ public class BlogController {
         blogPost.setUser(sessionService.getUser());
         blogPost.setProject(project); 
         blogPostService.addBlogPost(blogPost);
-        project.setBlogPost(blogPost); // Обновление связи
-        projectService.addProject(project); // Сохранение проекта с новым BlogPost
+        project.setBlogPost(blogPost); 
+        projectService.addProject(project); 
         return "redirect:/project/" + projectId + "/blog/" + blogPost.getId();
     }
 

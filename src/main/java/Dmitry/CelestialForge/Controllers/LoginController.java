@@ -32,14 +32,10 @@ public class LoginController {
     @Autowired
     private FileStorageService fileStorageService;
     @Autowired
-    private ProjectService projectService; // нужен для index
+    private ProjectService projectService; 
 
     @GetMapping("/logout")
     public String logout(HttpServletRequest request, HttpServletResponse response) {
-        // HttpSession session = request.getSession(false);
-        // if (session != null) {
-        //     session.invalidate();
-        // }
         return "redirect:/login?logout";
     }
 
@@ -83,13 +79,13 @@ public class LoginController {
             try {
                 String imageUrl = fileStorageService.uploadFile(image, "user", user.getId());
                 user.setPictureUrl(imageUrl);
-                userService.addUser(user); // Обновляем пользователя с URL изображения
+                userService.addUser(user);
             } catch (MinioException | IOException | InvalidKeyException | NoSuchAlgorithmException e) {
                 model.addAttribute("errorMessage", "Ошибка при загрузке изображения.");
                 return "registration";
             }
         }
-        else userService.addUser(user); // Сохраняем пользователя и получаем его ID
+        else userService.addUser(user);
 
         return "redirect:/login";
     }

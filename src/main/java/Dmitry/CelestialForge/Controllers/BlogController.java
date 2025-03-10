@@ -17,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import Dmitry.CelestialForge.Entities.BlogPost;
+import Dmitry.CelestialForge.Entities.Comment;
 import Dmitry.CelestialForge.Entities.Project;
 import Dmitry.CelestialForge.Services.BlogPostService;
 import Dmitry.CelestialForge.Services.FileStorageService;
+import Dmitry.CelestialForge.Services.LikeService;
 import Dmitry.CelestialForge.Services.ProjectService;
 import Dmitry.CelestialForge.Session.SessionService;
 import io.minio.errors.MinioException;
@@ -32,13 +34,12 @@ public class BlogController {
 
     @Autowired
     private BlogPostService blogPostService;
-
     @Autowired
     private ProjectService projectService;
-
+    @Autowired
+    private LikeService likeService;
     @Autowired 
     private SessionService sessionService;
-
     @Autowired
     private FileStorageService fileStorageService;
 
@@ -103,6 +104,17 @@ public class BlogController {
         model.addAttribute("isOwnerOrContributor", projectService.isOwnerOrContributor(project, sessionService.getUser()));
 
         return "blog/view";
+    }
+
+    @PostMapping("/like")
+    public String likeBlogPost(@PathVariable Long projectId, @PathVariable Long blogPostId) {
+        BlogPost blogPost = blogPostService.findById(blogPostId);
+        if (blogPost != null) {
+            likeService.addLikeToBlogPost(sessionService.getUser(), blogPost);
+            if (blogPost != null) 
+                return "redirect:/project/" + projectId + "/blog/" + blogPostId;
+        }
+        return "redirect:";
     }
 }
 

@@ -32,7 +32,8 @@ public class Project {
     private String pictureUrl; 
     private Double targetAmount;
     private Double raisedAmount = 0.0;
-    private LocalDateTime endTime;    
+    private LocalDateTime endTime;   
+    private LocalDateTime createdAt; 
     
     @ManyToOne
     private User user;
@@ -100,6 +101,12 @@ public class Project {
     }
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
     public User getUser() {
         return user;

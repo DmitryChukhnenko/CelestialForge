@@ -1,6 +1,7 @@
 package Dmitry.CelestialForge.Entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,6 +27,8 @@ public class Donation implements Serializable{
 
     private Double amount;
 
+    private LocalDateTime createdAt;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user; 
@@ -45,6 +48,12 @@ public class Donation implements Serializable{
     }
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
     public User getUser() {
         return user;

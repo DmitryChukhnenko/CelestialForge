@@ -33,16 +33,16 @@ public class UserService {
 
 	public User updateUser(User user, User userUpdateDTO) {
         if (user != null) {
-            if (userUpdateDTO.getUsername() != null && !"basic".equals(userUpdateDTO.getUsername())) {
+            if (userUpdateDTO.getUsername() != null && !"".equals(userUpdateDTO.getUsername())) {
                 user.setUsername(userUpdateDTO.getUsername());
             }
-            if (userUpdateDTO.getEmail() != null && !"basic@mail.com".equals(userUpdateDTO.getEmail())) {
+            if (userUpdateDTO.getEmail() != null && !"".equals(userUpdateDTO.getEmail())) {
                 user.setEmail(userUpdateDTO.getEmail());
             }
-            if (userUpdateDTO.getPassword() != null && !"basic1".equals(userUpdateDTO.getPassword())) {
+            if (userUpdateDTO.getPassword() != null && !"".equals(userUpdateDTO.getPassword())) {
                 user.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
             }
-            if (userUpdateDTO.getPictureUrl() != null) {
+            if (userUpdateDTO.getPictureUrl() != null && !"".equals(userUpdateDTO.getPassword())) {
                 user.setPictureUrl(userUpdateDTO.getPictureUrl());
             }
             return userRepository.save(user);

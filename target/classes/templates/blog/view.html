@@ -17,6 +17,7 @@
             <p class="post-meta">Автор: <span th:text="${blogPost.user.username}"></span> | Дата: <span th:text="${#temporals.format(blogPost.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
             <img th:if="${blogPost.pictureUrl != null}" th:src="@{${blogPost.pictureUrl}}" alt="Blog Image" class="blog-image"/>
             <div class="post-content" th:text="${blogPost.content}"></div>
+            <a th:href="@{/project/{projectId}(projectId=${blogPost.project.id})}/like" class="btn btn-secondary">Назад</a>
         </div>
         
         <div class="comments-section">

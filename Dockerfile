@@ -5,7 +5,7 @@ FROM openjdk:23-jdk-slim
 WORKDIR /app
 
 # Копируем jar файл вашего Spring Boot приложения
-COPY target/CelestialForge-0.0.1-SNAPSHOT.jar app.jar
+COPY target/CelestialForge-0.1.1-SNAPSHOT.jar app.jar
 
 # Открываем порт, на котором будет работать приложение
 EXPOSE 8080

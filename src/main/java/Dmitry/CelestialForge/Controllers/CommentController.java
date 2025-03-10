@@ -50,6 +50,7 @@ public class CommentController {
         return "redirect:/project/" + projectId + "/blog/" + blogPostId;
     }
 
+    // TODO remove likes as a type
     @PostMapping("/like")
     public String likeComment(@PathVariable Long projectId, @PathVariable Long blogPostId, @RequestParam Long commentId) {
         Comment comment = commentService.findById(commentId);

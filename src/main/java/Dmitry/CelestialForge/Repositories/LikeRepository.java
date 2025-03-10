@@ -9,6 +9,7 @@ import Dmitry.CelestialForge.Entities.Comment;
 import Dmitry.CelestialForge.Entities.Like;
 import Dmitry.CelestialForge.Entities.User;
 
+// TODO remove likes as a type
 public interface LikeRepository extends JpaRepository<Like, Long> {
     List<Like> findByUser(User user);
     List<Like> findByBlogPost(BlogPost blogPost);

@@ -106,6 +106,7 @@ public class BlogController {
         return "blog/view";
     }
 
+    // TODO remove likes as a type
     @PostMapping("/like")
     public String likeBlogPost(@PathVariable Long projectId, @PathVariable Long blogPostId) {
         BlogPost blogPost = blogPostService.findById(blogPostId);

@@ -13,6 +13,7 @@ import Dmitry.CelestialForge.Entities.Like;
 import Dmitry.CelestialForge.Entities.User;
 import Dmitry.CelestialForge.Repositories.LikeRepository;
 
+// TODO remove likes as a type
 @Service
 public class LikeService {
 

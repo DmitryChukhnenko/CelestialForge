@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+// TODO remove likes as a type
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor

@@ -42,7 +42,7 @@ public class FileStorageService {
         logger.info(fullUrl);
         int queryIndex = fullUrl.indexOf("?");
         if (queryIndex != -1) {
-            return fullUrl.substring(0, queryIndex).replace("minio:9000", "localhost/files");
+            return fullUrl.substring(0, queryIndex).replace("minio:9000", "localhost:8000/files");
         }
         return fullUrl;
     }

@@ -1,6 +1,7 @@
 /* Общие стили */
 body {
     margin: 0;
+    margin-bottom: 100px; /* Примерная высота футера */
     font-family: Arial, sans-serif;
     background-color: #090C24; /* Цвет фона проекта */
     color: #FFFFFF; /* Основной текст остаётся белым для контраста */
@@ -56,10 +57,10 @@ header {
 
 /* Footer */
 footer {
-    background-color: #7626B1; /* Не выделяющийся акцент */
+    background-color: #7626B1;
     padding: 20px;
     text-align: center;
-    position: absolute;
+    position: fixed;
     width: 100%;
     bottom: 0;
     box-sizing: border-box;

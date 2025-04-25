@@ -2,13 +2,67 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title th:text="'Пост: ' + ${blogPost.title} + ' - Celestial Forge'">Пост</title>
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Обработчики для постов
+            document.querySelectorAll('.blog-like-btn').forEach(btn => {
+                btn.addEventListener('click', handleBlogLike);
+            });
+            
+            // Обработчики для комментариев
+            document.querySelectorAll('.comment-like-btn').forEach(btn => {
+                btn.addEventListener('click', handleCommentLike);
+            });
+        });
+
+        async function handleBlogLike(e) {
+            const btn = e.currentTarget;
+            const blogPostId = btn.dataset.blogpostId;
+            await handleLikeAction(`/api/likes/blogPost/${blogPostId}`, btn);
+        }
+
+        async function handleCommentLike(e) {
+            const btn = e.currentTarget;
+            const commentId = btn.dataset.commentId;
+            await handleLikeAction(`/api/likes/comment/${commentId}`, btn);
+        }
+
+        async function handleLikeAction(url, btn) {
+            try {
+                const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+                const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken,
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                btn.querySelector('.count').textContent = data.count;
+                btn.classList.toggle('active', data.liked);
+                
+            } catch (error) {
+                console.error('Fetch error:', error);
+                if (error.message.includes('401')) {
+                    window.location.href = '/login';
+                }
+            }
+        }
+    </script>
 </head>
 <body>
     <div th:replace="~{fragments/header :: header}"></div>
-    
     <main class="main-content">        
         <a th:href="@{/project/{projectId}(projectId=${blogPost.project.id})}" class="btn btn-secondary">Назад</a>
 
@@ -17,19 +71,26 @@
             <p class="post-meta">Автор: <span th:text="${blogPost.user.username}"></span> | Дата: <span th:text="${#temporals.format(blogPost.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
             <img th:if="${blogPost.pictureUrl != null}" th:src="@{${blogPost.pictureUrl}}" alt="Blog Image" class="blog-image"/>
             <div class="post-content" th:text="${blogPost.content}"></div>
-            <a th:href="@{/project/{projectId}(projectId=${blogPost.project.id})}/like" class="btn btn-secondary">Лайк</a>
+            <button class="blog-like-btn btn btn-primary" 
+                    th:data-blogpost-id="${blogPost.id}"
+                    th:classappend="${blogPostLiked ? 'active' : ''}">
+                <span class="icon">♥</span>
+                <span class="count" th:text="${@blogPostLikeService.countLikes(blogPost)}">0</span>
+            </button>
         </div>
         
         <div class="comments-section">
             <h2>Комментарии</h2>
             <div th:each="comment : ${blogPost.comments}">
                 <div class="comment">
-                    <p><strong th:text="${comment.user.username}"></strong> <span th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
+                    <p><strong th:text="${comment.user?.username} ?: 'Аноним'"></strong> <span th:text="${#temporals.format(comment.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
                     <p th:text="${comment.content}"></p>
-                    <form th:action="@{/project/{projectId}/blog/{blogPostId}/comments/like(projectId=${blogPost.project.id}, blogPostId=${blogPost.id})}" method="post">
-                        <input type="hidden" name="commentId" th:value="${comment.id}"/>
-                        <button type="submit" class="btn btn-secondary">Нравится</button>
-                    </form>
+                    <button class="comment-like-btn btn btn-primary" 
+                            th:data-comment-id="${comment.id}"
+                            th:classappend="${comment.likedByCurrentUser ? 'active' : ''}">
+                        <span class="icon">♥</span>
+                        <span class="count" th:text="${@commentLikeService.countLikes(comment)}">0</span>
+                    </button>
                 </div>
             </div>
             <a th:href="@{/project/{projectId}/blog/{blogPostId}/comments/create(projectId=${blogPost.project.id}, blogPostId=${blogPost.id})}" class="btn btn-primary">Добавить комментарий</a>

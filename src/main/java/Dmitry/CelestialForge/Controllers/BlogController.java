@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,9 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import Dmitry.CelestialForge.Entities.BlogPost;
 import Dmitry.CelestialForge.Entities.Comment;
 import Dmitry.CelestialForge.Entities.Project;
+import Dmitry.CelestialForge.Entities.User;
+import Dmitry.CelestialForge.Services.BlogPostLikeService;
 import Dmitry.CelestialForge.Services.BlogPostService;
+import Dmitry.CelestialForge.Services.CommentLikeService;
 import Dmitry.CelestialForge.Services.FileStorageService;
-import Dmitry.CelestialForge.Services.LikeService;
 import Dmitry.CelestialForge.Services.ProjectService;
 import Dmitry.CelestialForge.Session.SessionService;
 import io.minio.errors.MinioException;
@@ -37,7 +40,9 @@ public class BlogController {
     @Autowired
     private ProjectService projectService;
     @Autowired
-    private LikeService likeService;
+    private BlogPostLikeService blogPostLikeService;
+    @Autowired
+    private CommentLikeService commentLikeService;
     @Autowired 
     private SessionService sessionService;
     @Autowired
@@ -71,11 +76,10 @@ public class BlogController {
         if (!projectService.isOwnerOrContributor(project, sessionService.getUser())) {
             return "redirect:/project/" + projectId + "/blog";
         }
-
         if (!image.isEmpty()) {
-            try {
+            try {                
                 String imageUrl = fileStorageService.uploadFile(image, "blog", blogPost.getId());
-                blogPost.setPictureUrl(imageUrl);
+                blogPost.setPictureUrl(imageUrl);                
             } catch (MinioException | IOException | InvalidKeyException | NoSuchAlgorithmException e) {
                 model.addAttribute("errorMessage", "Ошибка при загрузке изображения.");
                 return "blog/create";
@@ -98,24 +102,20 @@ public class BlogController {
         if (blogPost == null || !blogPost.getProject().getId().equals(projectId)) {
             throw new EntityNotFoundException("Пост в блоге не найден");
         }
+        User user = sessionService.getUser();
 
         model.addAttribute("project", project);
         model.addAttribute("blogPost", blogPost);
-        model.addAttribute("isOwnerOrContributor", projectService.isOwnerOrContributor(project, sessionService.getUser()));
-
-        return "blog/view";
-    }
-
-    // TODO remove likes as a type
-    @PostMapping("/like")
-    public String likeBlogPost(@PathVariable Long projectId, @PathVariable Long blogPostId) {
-        BlogPost blogPost = blogPostService.findById(blogPostId);
-        if (blogPost != null) {
-            likeService.addLikeToBlogPost(sessionService.getUser(), blogPost);
-            if (blogPost != null) 
-                return "redirect:/project/" + projectId + "/blog/" + blogPostId;
+        model.addAttribute("isOwnerOrContributor", projectService.isOwnerOrContributor(project, sessionService.getUser()));        
+        
+        if(user != null) {
+            model.addAttribute("blogPostLiked", blogPostLikeService.hasUserLiked(user, blogPost));
+            Set<Comment> comments = blogPost.getComments();
+            Set<Long> likedComments = commentLikeService.findLikedCommentIds(user, comments);
+            comments.forEach(c -> c.setLikedByCurrentUser(likedComments.contains(c.getId())));
         }
-        return "redirect:";
+        
+        return "blog/view";
     }
 }
 

@@ -1,5 +1,8 @@
 package Dmitry.CelestialForge.Controllers;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +14,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import Dmitry.CelestialForge.Entities.Project;
 import Dmitry.CelestialForge.Entities.User;
 import Dmitry.CelestialForge.Services.DonationService;
+import Dmitry.CelestialForge.Services.FileStorageService;
+import Dmitry.CelestialForge.Services.ProjectLikeService;
 import Dmitry.CelestialForge.Services.ProjectService;
 import Dmitry.CelestialForge.Session.SessionService;
+import io.minio.errors.MinioException;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/project")
@@ -28,10 +36,14 @@ public class ProjectController {
     private DonationService donationService;
     @Autowired
     private SessionService sessionService;
+    @Autowired
+    private FileStorageService fileStorageService;
+    @Autowired
+    private ProjectLikeService likeService;
 
     @GetMapping
     public String listProjects(Model model) {
-        List<Project> projects = projectService.findAll();
+        List<Project> projects = projectService.findByUser(sessionService.getUser());
         model.addAttribute("projects", projects);
         return "project/list";
     }
@@ -43,7 +55,18 @@ public class ProjectController {
     }
 
     @PostMapping("/create")
-    public String createProject(@ModelAttribute Project project) {
+    public String createProject(@Valid @ModelAttribute Project project,
+                                 @RequestParam("image") MultipartFile image, Model model) {
+
+        if (!image.isEmpty()) {
+            try {                
+                String imageUrl = fileStorageService.uploadFile(image, "blog", project.getId());
+                project.setPictureUrl(imageUrl);                
+            } catch (MinioException | IOException | InvalidKeyException | NoSuchAlgorithmException e) {
+                model.addAttribute("errorMessage", "Ошибка при загрузке изображения.");
+                return "blog/create";
+            }
+        }
         User user = sessionService.getUser();
         project.setUser(user);
         project.getContributors().add(user);
@@ -56,7 +79,13 @@ public class ProjectController {
         Project project = projectService.findWithAll(id);
         if (project != null) {
             model.addAttribute("project", project);
-            model.addAttribute("isOwnerOrContributor", projectService.isOwnerOrContributor(project, sessionService.getUser()));
+            User user = sessionService.getUser();
+            
+            if(user != null) {
+                model.addAttribute("isOwnerOrContributor", projectService.isOwnerOrContributor(project, user));
+                model.addAttribute("userLiked", likeService.hasUserLiked(user, project));
+            }
+
             return "project/view";            
         }
         return "redirect:/project";

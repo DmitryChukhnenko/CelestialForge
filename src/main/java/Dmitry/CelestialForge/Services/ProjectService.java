@@ -1,6 +1,7 @@
 package Dmitry.CelestialForge.Services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,4 +49,8 @@ public class ProjectService {
     public List<Project> findAll() {
         return projectRepository.findAll();
     }    
+
+    public Optional<Project> findById(long id) {
+        return projectRepository.findById(id);
+    }   
 }

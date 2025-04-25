@@ -11,7 +11,7 @@
     
     <main class="main-content">
         <h1>Создать Новый Проект</h1>
-        <form action="#" th:action="@{/project/create}" th:object="${project}" method="post" class="form">
+        <form action="#" th:action="@{/project/create}" th:object="${project}" method="post" enctype="multipart/form-data" class="form">
             <div>
                 <label for="title">Заголовок:</label>
                 <input type="text" th:field="*{title}" id="title" required>
@@ -27,6 +27,10 @@
             <div>
                 <label for="endTime">Дата окончания:</label>
                 <input type="datetime-local" th:field="*{endTime}" id="endTime" required>
+            </div>
+            <div>
+                <label for="image">Загрузить изображение:</label>
+                <input type="file" id="image" name="image" accept="image/*" />
             </div>
             <button type="submit" class="btn btn-primary">Создать</button>
         </form>
